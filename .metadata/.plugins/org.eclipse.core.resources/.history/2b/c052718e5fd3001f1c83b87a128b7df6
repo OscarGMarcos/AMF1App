@@ -1,0 +1,328 @@
+package Interfaz;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.*;
+import javax.swing.*;
+
+public class VentanaPrincipal extends JFrame {
+
+    private static final long serialVersionUID = 1L;
+    private JPanel contentPane;
+    private JPanel panelCentral; // Panel con CardLayout para cambiar subpaneles
+    private CardLayout cardLayout;
+    private Connection connection;
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                VentanaPrincipal frame = new VentanaPrincipal();
+                frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public VentanaPrincipal() {
+        // Configurar conexión a la base de datos
+        try {
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bdamf1", "root", "#Oscar_2005");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al conectar con la base de datos.");
+            System.exit(1);
+        }
+
+        setTitle("ASTON MARTIN ARAMCO FORMULA ONE TEAM - Inicio");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 1062, 757);
+
+        // Configurar contentPane
+        contentPane = new JPanel();
+        contentPane.setBackground(new Color(0, 102, 94));
+        contentPane.setLayout(new BorderLayout());
+        setContentPane(contentPane);
+
+        // Crear Panel Central con CardLayout
+        cardLayout = new CardLayout();
+        panelCentral = new JPanel(cardLayout);
+        contentPane.add(panelCentral, BorderLayout.CENTER);
+
+        // Crear Panel Izquierdo (Menú Lateral)
+        JPanel menuLateral = new JPanel();
+        menuLateral.setBackground(new Color(240, 240, 240));
+        menuLateral.setPreferredSize(new Dimension(200, 0));
+        menuLateral.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 20));
+        contentPane.add(menuLateral, BorderLayout.WEST);
+
+        // Botón para Temporadas
+        JButton btnTemporadas = new JButton("Temporadas");
+        btnTemporadas.setFont(new Font("SansSerif", Font.BOLD, 12));
+        menuLateral.add(btnTemporadas);
+
+        // Menú emergente para Temporadas
+        JPopupMenu menuTemporadas = new JPopupMenu();
+        JMenu menu2024 = new JMenu("Temporada 2024");
+        JMenu menu2025 = new JMenu("Temporada 2025");
+        menuTemporadas.add(menu2024);
+        menuTemporadas.add(menu2025);
+
+        // Agregar rondas al menú 2024
+        for (int i = 1; i <= 5; i++) { // Para simplificar, usamos 5 rondas como ejemplo
+            JMenuItem rondaItem = new JMenuItem("Ronda " + i);
+            menu2024.add(rondaItem);
+            int rondaId = i;
+
+            // Crear un panel para cada ronda
+            JPanel panelRonda = crearPanelRonda(rondaId);
+            panelCentral.add(panelRonda, "2024_Ronda" + i);
+
+            // Asociar ActionListener para cambiar el panel
+            rondaItem.addActionListener(e -> cardLayout.show(panelCentral, "2024_Ronda" + rondaId));
+        }
+
+        // Agregar rondas al menú 2025 (similar a 2024)
+        for (int i = 1; i <= 5; i++) {
+            JMenuItem rondaItem = new JMenuItem("Ronda " + i);
+            menu2025.add(rondaItem);
+            int rondaId = i;
+
+            // Crear un panel para cada ronda
+            JPanel panelRonda = crearPanelRonda(rondaId + 100); // ID de ejemplo para 2025
+            panelCentral.add(panelRonda, "2025_Ronda" + i);
+
+            // Asociar ActionListener para cambiar el panel
+            rondaItem.addActionListener(e -> cardLayout.show(panelCentral, "2025_Ronda" + rondaId));
+        }
+
+        // Mostrar el menú emergente al hacer clic en el botón
+        btnTemporadas.addActionListener(e -> menuTemporadas.show(btnTemporadas, 0, btnTemporadas.getHeight()));
+
+        // Botón para Pilotos
+        JButton btnPilotos = new JButton("Pilotos");
+        btnPilotos.setFont(new Font("SansSerif", Font.BOLD, 12));
+        menuLateral.add(btnPilotos);
+
+        btnPilotos.addActionListener(e -> mostrarPilotos());
+
+        // Subpanel inicial
+        JPanel panelInicio = new JPanel();
+        panelInicio.setBackground(new Color(0, 102, 94));
+        panelInicio.setLayout(new BorderLayout());
+        JLabel labelInicio = new JLabel("Bienvenido al Sistema de Gestión", SwingConstants.CENTER);
+        labelInicio.setFont(new Font("SansSerif", Font.BOLD, 18));
+        labelInicio.setForeground(Color.WHITE);
+        panelInicio.add(labelInicio, BorderLayout.CENTER);
+
+        panelCentral.add(panelInicio, "Inicio");
+        cardLayout.show(panelCentral, "Inicio");
+    }
+
+    private JPanel crearPanelRonda(int rondaId) {
+        JPanel panelRonda = new JPanel(new GridLayout(6, 2));
+        panelRonda.setBackground(new Color(0, 102, 94));
+
+        JTextField nombreGP = new JTextField();
+        JTextField fecha = new JTextField();
+        JTextField posicionFernando = new JTextField();
+        JTextField posicionLance = new JTextField();
+
+        panelRonda.add(new JLabel("Nombre GP:"));
+        panelRonda.add(nombreGP);
+        panelRonda.add(new JLabel("Fecha:"));
+        panelRonda.add(fecha);
+        panelRonda.add(new JLabel("Posición Fernando:"));
+        panelRonda.add(posicionFernando);
+        panelRonda.add(new JLabel("Posición Lance:"));
+        panelRonda.add(posicionLance);
+
+        // Cargar datos de la base de datos
+        cargarDatosRonda(rondaId, nombreGP, fecha, posicionFernando, posicionLance);
+
+        JButton btnModificar = new JButton("Modificar");
+        btnModificar.addActionListener(e -> modificarDatosRonda(rondaId, nombreGP, fecha, posicionFernando, posicionLance));
+
+        JButton btnCerrar = new JButton("Cerrar");
+        btnCerrar.addActionListener(e -> cardLayout.show(panelCentral, "Inicio"));
+
+        panelRonda.add(btnModificar);
+        panelRonda.add(btnCerrar);
+
+        return panelRonda;
+    }
+
+    private void cargarDatosRonda(int rondaId, JTextField nombreGP, JTextField fecha, JTextField posFernando, JTextField posLance) {
+        try (PreparedStatement stmt = connection.prepareStatement("SELECT nombreGP, fecha FROM carreras WHERE numeroCarrera = ?")) {
+            stmt.setInt(1, rondaId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                nombreGP.setText(rs.getString("nombreGP"));
+                fecha.setText(rs.getString("fecha"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Fernando
+        cargarPosicion(rondaId, 14, posFernando);
+        // Lance
+        cargarPosicion(rondaId, 18, posLance);
+    }
+
+    private void cargarPosicion(int rondaId, int pilotoId, JTextField campoPosicion) {
+        try (PreparedStatement stmt = connection.prepareStatement("SELECT posicion FROM posiciones WHERE idPiloto = ? AND numeroCarrera = ?")) {
+            stmt.setInt(1, pilotoId);
+            stmt.setInt(2, rondaId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                campoPosicion.setText(rs.getString("posicion"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void modificarDatosRonda(int rondaId, JTextField nombreGP, JTextField fecha, JTextField posFernando, JTextField posLance) {
+        try (PreparedStatement stmt = connection.prepareStatement("UPDATE carreras SET nombreGP = ?, fecha = ? WHERE numeroCarrera = ?")) {
+            stmt.setString(1, nombreGP.getText());
+            stmt.setString(2, fecha.getText());
+            stmt.setInt(3, rondaId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Actualizar posiciones
+        actualizarPosicion(rondaId, 14, posFernando.getText());
+        actualizarPosicion(rondaId, 18, posLance.getText());
+
+        JOptionPane.showMessageDialog(this, "Datos actualizados.");
+    }
+
+    private void actualizarPosicion(int rondaId, int pilotoId, String posicion) {
+        try (PreparedStatement stmt = connection.prepareStatement("UPDATE posiciones SET posicion = ? WHERE idPiloto = ? AND numeroCarrera = ?")) {
+            stmt.setString(1, posicion);
+            stmt.setInt(2, pilotoId);
+            stmt.setInt(3, rondaId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void mostrarPilotos() {
+        JPanel panelPilotos = new JPanel(new GridLayout(2, 1));
+        panelPilotos.setBackground(new Color(0, 102, 94));
+
+        JButton btnFernando = new JButton("Fernando Alonso");
+        btnFernando.addActionListener(e -> mostrarDetallePiloto(14));
+        panelPilotos.add(btnFernando);
+
+        JButton btnLance = new JButton("Lance Stroll");
+        btnLance.addActionListener(e -> mostrarDetallePiloto(18));
+        panelPilotos.add(btnLance);
+
+        panelCentral.add(panelPilotos, "Pilotos");
+        cardLayout.show(panelCentral, "Pilotos");
+    }
+
+    private void mostrarDetallePiloto(int pilotoId) {
+        JPanel panelPiloto = new JPanel(new GridLayout(11, 2));
+        panelPiloto.setBackground(new Color(0, 102, 94));
+
+        JTextField nombre = new JTextField();
+        JTextField edad = new JTextField();
+        JTextField ciudadNacimiento = new JTextField();
+        JTextField paisNacimiento = new JTextField();
+        JTextField peso = new JTextField();
+        JTextField altura = new JTextField();
+        JTextField gpDisputados = new JTextField();
+        JTextField podios = new JTextField();
+        JTextField victorias = new JTextField();
+        JTextField puntosTotales = new JTextField();
+
+        panelPiloto.add(new JLabel("Nombre:"));
+        panelPiloto.add(nombre);
+        panelPiloto.add(new JLabel("Edad:"));
+        panelPiloto.add(edad);
+        panelPiloto.add(new JLabel("Ciudad Nacimiento:"));
+        panelPiloto.add(ciudadNacimiento);
+        panelPiloto.add(new JLabel("País Nacimiento:"));
+        panelPiloto.add(paisNacimiento);
+        panelPiloto.add(new JLabel("Peso:"));
+        panelPiloto.add(peso);
+        panelPiloto.add(new JLabel("Altura:"));
+        panelPiloto.add(altura);
+        panelPiloto.add(new JLabel("GP Disputados:"));
+        panelPiloto.add(gpDisputados);
+        panelPiloto.add(new JLabel("Podios:"));
+        panelPiloto.add(podios);
+        panelPiloto.add(new JLabel("Victorias:"));
+        panelPiloto.add(victorias);
+        panelPiloto.add(new JLabel("Puntos Totales:"));
+        panelPiloto.add(puntosTotales);
+
+        // Cargar datos del piloto
+        cargarDatosPiloto(pilotoId, nombre, edad, ciudadNacimiento, paisNacimiento, peso, altura, gpDisputados, podios, victorias, puntosTotales);
+
+        JButton btnModificar = new JButton("Modificar");
+        btnModificar.addActionListener(e -> modificarDatosPiloto(pilotoId, nombre, edad, ciudadNacimiento, paisNacimiento, peso, altura, gpDisputados, podios, victorias, puntosTotales));
+
+        JButton btnCerrar = new JButton("Cerrar");
+        btnCerrar.addActionListener(e -> cardLayout.show(panelCentral, "Inicio"));
+
+        panelPiloto.add(btnModificar);
+        panelPiloto.add(btnCerrar);
+
+        panelCentral.add(panelPiloto, "DetallePiloto" + pilotoId);
+        cardLayout.show(panelCentral, "DetallePiloto" + pilotoId);
+    }
+
+    private void cargarDatosPiloto(int pilotoId, JTextField nombre, JTextField edad, JTextField ciudadNacimiento, JTextField paisNacimiento, JTextField peso, JTextField altura, JTextField gpDisputados, JTextField podios, JTextField victorias, JTextField puntosTotales) {
+        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM pilotos WHERE idPiloto = ?")) {
+            stmt.setInt(1, pilotoId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                nombre.setText(rs.getString("nombre"));
+                edad.setText(rs.getString("edad"));
+                ciudadNacimiento.setText(rs.getString("ciudadNacimiento"));
+                paisNacimiento.setText(rs.getString("paisNacimiento"));
+                peso.setText(rs.getString("peso"));
+                altura.setText(rs.getString("altura"));
+                gpDisputados.setText(rs.getString("gpDisputados"));
+                podios.setText(rs.getString("podios"));
+                victorias.setText(rs.getString("victorias"));
+                puntosTotales.setText(rs.getString("puntosTotales"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void modificarDatosPiloto(int pilotoId, JTextField nombre, JTextField edad, JTextField ciudadNacimiento, JTextField paisNacimiento, JTextField peso, JTextField altura, JTextField gpDisputados, JTextField podios, JTextField victorias, JTextField puntosTotales) {
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "UPDATE pilotos SET nombre = ?, edad = ?, ciudadNacimiento = ?, paisNacimiento = ?, peso = ?, altura = ?, gpDisputados = ?, podios = ?, victorias = ?, puntosTotales = ? WHERE idPiloto = ?")) {
+            stmt.setString(1, nombre.getText());
+            stmt.setInt(2, Integer.parseInt(edad.getText()));
+            stmt.setString(3, ciudadNacimiento.getText());
+            stmt.setString(4, paisNacimiento.getText());
+            stmt.setDouble(5, Double.parseDouble(peso.getText()));
+            stmt.setDouble(6, Double.parseDouble(altura.getText()));
+            stmt.setInt(7, Integer.parseInt(gpDisputados.getText()));
+            stmt.setInt(8, Integer.parseInt(podios.getText()));
+            stmt.setInt(9, Integer.parseInt(victorias.getText()));
+            stmt.setInt(10, Integer.parseInt(puntosTotales.getText()));
+            stmt.setInt(11, pilotoId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        JOptionPane.showMessageDialog(this, "Datos actualizados.");
+    }
+}
+
+
+

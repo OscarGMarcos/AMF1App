@@ -1,0 +1,21 @@
+package Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+
+import org.junit.Test;
+
+import Persistencia.GestorPersistencia;
+
+class GestorPersistencia {
+
+	 @Test
+	    public void testValidarCredenciales() {
+	        // Usuario y contraseña válidos
+	        assertTrue(GestorPersistenciaTest.validarCredenciales("u001", "contraseñaCorrecta"));
+
+	        // Usuario o contraseña inválidos
+	        assertFalse(GestorPersistenciaTest.validarCredenciales("u001", "contraseñaIncorrecta"));
+	        assertFalse(GestorPersistenciaTest.validarCredenciales("usuarioInexistente", "cualquierContraseña"));
+	    }
+	}

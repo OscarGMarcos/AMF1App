@@ -1,0 +1,102 @@
+package Modelo;
+
+public class Piloto {
+	private int idPiloto;
+	private String nombre;
+	private int edad;
+	private String ciudadNacimiento;
+	private String paisNacimiento;
+	private double peso;
+	private double altura;
+	private int gpDisputados;
+	private int podios;
+	private int victorias;
+	private int puntosTotales;
+	public Piloto(int idPiloto, String nombre, int edad, String ciudadNacimiento, String paisNacimiento, double peso,
+			double altura, int gpDisputados, int podios, int victorias, int puntosTotales) {
+		this.idPiloto = idPiloto;
+		this.nombre = nombre;
+		this.edad = edad;
+		this.ciudadNacimiento = ciudadNacimiento;
+		this.paisNacimiento = paisNacimiento;
+		this.peso = peso;
+		this.altura = altura;
+		this.gpDisputados = gpDisputados;
+		this.podios = podios;
+		this.victorias = victorias;
+		this.puntosTotales = puntosTotales;
+	}
+	public int getIdPiloto() {
+		return idPiloto;
+	}
+	public void setIdPiloto(int idPiloto) {
+		this.idPiloto = idPiloto;
+	}
+	public String getNombre() {
+		return nombre;
+	}
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+	public int getEdad() {
+		return edad;
+	}
+	public void setEdad(int edad) {
+		this.edad = edad;
+	}
+	public String getCiudadNacimiento() {
+		return ciudadNacimiento;
+	}
+	public void setCiudadNacimiento(String ciudadNacimiento) {
+		this.ciudadNacimiento = ciudadNacimiento;
+	}
+	public String getPaisNacimiento() {
+		return paisNacimiento;
+	}
+	public void setPaisNacimiento(String paisNacimiento) {
+		this.paisNacimiento = paisNacimiento;
+	}
+	public double getPeso() {
+		return peso;
+	}
+	public void setPeso(double peso) {
+		this.peso = peso;
+	}
+	public double getAltura() {
+		return altura;
+	}
+	public void setAltura(double altura) {
+		this.altura = altura;
+	}
+	public int getGpDisputados() {
+		return gpDisputados;
+	}
+	public void setGpDisputados(int gpDisputados) {
+		this.gpDisputados = gpDisputados;
+	}
+	public int getPodios() {
+		return podios;
+	}
+	public void setPodios(int podios) {
+		this.podios = podios;
+	}
+	public int getVictorias() {
+		return victorias;
+	}
+	public void setVictorias(int victorias) {
+		this.victorias = victorias;
+	}
+	public int getPuntosTotales() {
+		return puntosTotales;
+	}
+	public void setPuntosTotales(int puntosTotales) {
+		this.puntosTotales = puntosTotales;
+	}
+	@Override
+	public String toString() {
+		return "Piloto [idPiloto=" + idPiloto + ", nombre=" + nombre + ", edad=" + edad + ", ciudadNacimiento="
+				+ ciudadNacimiento + ", paisNacimiento=" + paisNacimiento + ", peso=" + peso + ", altura=" + altura
+				+ ", gpDisputados=" + gpDisputados + ", podios=" + podios + ", victorias=" + victorias
+				+ ", puntosTotales=" + puntosTotales + "]";
+	}	
+}

@@ -1,0 +1,25 @@
+package Persistencia;
+
+import java.sql.*;
+
+public class GestorPersistencia {
+	private static final String URL = "jdbc:mysql://localhost:3306/bdamf1";
+    private static final String USER = "root"; // Cambia según tu configuración
+    private static final String PASSWORD = "#Oscar_2005"; // Cambia según tu configuración
+
+    public static boolean validarCredenciales(String usuario, String contrasena) {
+        try (Connection conexion = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            String sql = "SELECT * FROM administradores WHERE usuario = ? AND contraseña = ?";
+            PreparedStatement preparedStatement = conexion.prepareStatement(sql);
+            preparedStatement.setString(1, usuario);
+            preparedStatement.setString(2, contrasena);
+
+            ResultSet resultado = preparedStatement.executeQuery();
+            return resultado.next(); // Retorna true si hay coincidencias
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+}
+

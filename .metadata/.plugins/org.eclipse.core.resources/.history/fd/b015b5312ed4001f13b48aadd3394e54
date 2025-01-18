@@ -1,0 +1,36 @@
+package Logica;
+
+import Excepciones.ProyectoExcepcion;
+import Persistencia.GestorPersistencia;
+
+public class GestionApp {
+	 // Atributo para almacenar el usuario actual
+    private String usuarioActual;
+
+    // Constructor
+    public GestionApp() {
+		this.usuarioActual = null;
+	}
+
+    // Método para validar las credenciales (llama al GestorPersistencia)
+    public boolean validarCredenciales(String usuario, String contrasena) {
+        boolean credencialesValidas = GestorPersistencia.validarCredenciales(usuario, contrasena);
+        if (credencialesValidas) {
+            this.usuarioActual = usuario; // Guarda el usuario actual si es válido
+        }
+        return credencialesValidas;
+    }
+
+    
+
+	// Método para obtener el usuario actual
+    public String getUsuarioActual() {
+        return usuarioActual;
+    }
+
+    // Método para cerrar sesión (limpia el usuario actual)
+    public void cerrarSesion() {
+        this.usuarioActual = null;
+    }
+}
+

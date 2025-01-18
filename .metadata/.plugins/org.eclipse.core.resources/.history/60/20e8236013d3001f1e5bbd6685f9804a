@@ -1,0 +1,102 @@
+package Interfaz;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.*;
+
+public class VentanaPrincipal extends JFrame {
+
+    private static final long serialVersionUID = 1L;
+    private JPanel contentPane;
+    private JPanel panelCentral; // Panel con CardLayout para cambiar subpaneles
+    private CardLayout cardLayout;
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                VentanaPrincipal frame = new VentanaPrincipal();
+                frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public VentanaPrincipal() {
+        setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\Users\\oscar\\2ºDAM\\PROYECTO\\IMG-APPS\\IMG-App-Icono App.jpg"));
+        setTitle("ASTON MARTIN ARAMCO FORMULA ONE TEAM - Inicio");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 1062, 757);
+
+        // Configurar contentPane
+        contentPane = new JPanel();
+        contentPane.setBackground(new Color(0, 102, 94));
+        contentPane.setLayout(new BorderLayout());
+        setContentPane(contentPane);
+
+        // Crear Panel Central con CardLayout
+        cardLayout = new CardLayout();
+        panelCentral = new JPanel(cardLayout);
+        contentPane.add(panelCentral, BorderLayout.CENTER);
+
+        // Subpanel inicial
+        JPanel panelInicio = new JPanel();
+        panelInicio.setBackground(new Color(0, 102, 94));
+        panelInicio.setLayout(null);
+        JLabel label_1 = new JLabel("Bienvenido al Sistema de Gestión");
+        label_1.setBounds(186, 139, 300, 30);
+        label_1.setFont(new Font("SansSerif", Font.BOLD, 14));
+        label_1.setForeground(Color.WHITE);
+        panelInicio.add(label_1);
+        panelCentral.add(panelInicio, "Inicio");
+
+        // Crear JMenuBar para las opciones del menú
+        JMenuBar menuBar = new JMenuBar();
+        setJMenuBar(menuBar);
+
+        JMenu mnNewMenu = new JMenu("Temporadas");
+        mnNewMenu.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        menuBar.add(mnNewMenu);
+
+        JMenu mnTemporada2024 = new JMenu("Temporada 2024");
+        mnNewMenu.add(mnTemporada2024);
+
+        JMenu mnTemporada2025 = new JMenu("Temporada 2025");
+        mnNewMenu.add(mnTemporada2025);
+
+        // Agregar las rondas y sus paneles
+        agregarRondas(mnTemporada2024, "2024");
+        agregarRondas(mnTemporada2025, "2025");
+    }
+
+    /**
+     * Agrega las rondas de una temporada al menú y sus correspondientes paneles.
+     */
+    private void agregarRondas(JMenu menuTemporada, String temporada) {
+        for (int i = 1; i <= 24; i++) {
+            String rondaNombre = "Ronda " + i;
+            JMenuItem menuItemRonda = new JMenuItem(rondaNombre);
+            menuTemporada.add(menuItemRonda);
+
+            // Crear el panel correspondiente a esta ronda
+            JPanel panelRonda = new JPanel();
+            panelRonda.setBackground(new Color(0, 102, 94));
+            panelRonda.setLayout(null);
+            JLabel labelRonda = new JLabel("Temporada " + temporada + " - " + rondaNombre);
+            labelRonda.setBounds(200, 150, 400, 30);
+            labelRonda.setFont(new Font("SansSerif", Font.BOLD, 16));
+            labelRonda.setForeground(Color.WHITE);
+            panelRonda.add(labelRonda);
+
+            // Agregar el panel al CardLayout
+            String panelKey = "Temporada" + temporada + "_Ronda" + i;
+            panelCentral.add(panelRonda, panelKey);
+
+            // Asociar ActionListener al JMenuItem
+            menuItemRonda.addActionListener(e -> cardLayout.show(panelCentral, panelKey));
+        }
+    }
+}
+
+

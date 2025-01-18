@@ -1,0 +1,68 @@
+package Interfaz;
+
+import java.awt.EventQueue;
+import java.awt.Image;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import java.awt.Color;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon;
+
+public class VentanaLogin extends JFrame {
+
+    private static final long serialVersionUID = 1L;
+    private JPanel contentPane;
+
+    /**
+     * Launch the application.
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    VentanaLogin frame = new VentanaLogin();
+                    frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    /**
+     * Create the frame.
+     */
+    public VentanaLogin() {
+        setTitle("ASTON MARTIN ARAMCO FORMULA ONE TEAM");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 802, 688);
+
+        // Panel principal
+        contentPane = new JPanel();
+        contentPane.setBackground(new Color(0, 102, 94));
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        setContentPane(contentPane);
+        contentPane.setLayout(null);
+
+        // Dimensiones deseadas para el JLabel
+        int anchoDeseado = 297;
+        int altoDeseado = 222;
+
+        // Cargar y redimensionar la imagen
+        ImageIcon originalIcon = new ImageIcon("C:\\Users\\oscar\\2ºDAM\\PROYECTO\\IMG-APPS\\IMG-App-logo_blanco_removebg_preview.png");
+        Image imagenOriginal = originalIcon.getImage();
+        Image imagenEscalada = imagenOriginal.getScaledInstance(anchoDeseado, altoDeseado, Image.SCALE_SMOOTH);
+
+        // Crear un ImageIcon con la imagen redimensionada
+        ImageIcon iconoEscalado = new ImageIcon(imagenEscalada);
+
+        // Crear el JLabel para mostrar la imagen
+        JLabel lblLogoVertical = new JLabel(iconoEscalado);
+        lblLogoVertical.setBounds(179, 57, 268, 201); // Posición y tamaño del JLabel
+        contentPane.add(lblLogoVertical);
+    }
+}
+
+

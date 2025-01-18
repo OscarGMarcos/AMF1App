@@ -1,0 +1,152 @@
+package Interfaz;
+
+import java.awt.EventQueue;
+import java.awt.Image;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import java.awt.Color;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.ImageIcon;
+import java.awt.Toolkit;
+import javax.swing.JTextField;
+import javax.swing.JPasswordField;
+import java.awt.Font;
+import javax.swing.JButton;
+import javax.swing.border.LineBorder;
+
+import Persistencia.GestorPersistencia;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class VentanaLogin extends JFrame {
+
+    private static final long serialVersionUID = 1L;
+    private JPanel contentPane;
+    private JTextField tfUsuario;
+    private JPasswordField passwordField;
+
+    /**
+     * Launch the application.
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    VentanaLogin frame = new VentanaLogin();
+                    frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    /**
+     * Create the frame.
+     */
+    public VentanaLogin() {
+    	setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\Users\\oscar\\2ºDAM\\PROYECTO\\IMG-APPS\\IMG-App-Icono App.jpg"));
+        setTitle("ASTON MARTIN ARAMCO FORMULA ONE TEAM - Ingreso");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 901, 693);
+
+        // Panel principal
+        contentPane = new JPanel();
+        contentPane.setBackground(new Color(0, 102, 94));
+        contentPane.setBorder(null);
+        setContentPane(contentPane);
+        contentPane.setLayout(null);
+
+        // Dimensiones deseadas para el JLabel
+        int anchoDeseado = 297;
+        int altoDeseado = 222;
+
+        // Cargar y redimensionar la imagen
+        ImageIcon originalIcon = new ImageIcon("C:\\Users\\oscar\\2ºDAM\\PROYECTO\\IMG-APPS\\IMG-App-logo_blanco_removebg_preview.png");
+        Image imagenOriginal = originalIcon.getImage();
+        Image imagenEscalada = imagenOriginal.getScaledInstance(anchoDeseado, altoDeseado, Image.SCALE_SMOOTH);
+
+        // Crear un ImageIcon con la imagen redimensionada
+        ImageIcon iconoEscalado = new ImageIcon(imagenEscalada);
+
+        // Crear el JLabel para mostrar la imagen
+        JLabel lblLogoVertical = new JLabel(iconoEscalado);
+        lblLogoVertical.setBounds(315, 45, 251, 184); // Posición y tamaño del JLabel
+        contentPane.add(lblLogoVertical);
+        
+        tfUsuario = new JTextField();
+        tfUsuario.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        tfUsuario.setBounds(499, 313, 245, 41);
+        contentPane.add(tfUsuario);
+        tfUsuario.setColumns(10);
+        
+        passwordField = new JPasswordField();
+        passwordField.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        passwordField.setBounds(499, 415, 245, 41);
+        contentPane.add(passwordField);
+        
+        JLabel lblNewLabel = new JLabel("Introduce tu usuario:");
+        lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
+        lblNewLabel.setForeground(new Color(206, 220, 0));
+        lblNewLabel.setBounds(106, 311, 202, 41);
+        contentPane.add(lblNewLabel);
+        
+        JLabel lblIntroduceTu = new JLabel("Introduce tu contraseña:");
+        lblIntroduceTu.setForeground(new Color(206, 220, 0));
+        lblIntroduceTu.setFont(new Font("Tahoma", Font.PLAIN, 16));
+        lblIntroduceTu.setBounds(106, 413, 202, 41);
+        contentPane.add(lblIntroduceTu);
+        
+        JLabel lblBienvenido = new JLabel("Bienvenido");
+        lblBienvenido.setForeground(new Color(206, 220, 0));
+        lblBienvenido.setFont(new Font("Tahoma", Font.BOLD, 17));
+        lblBienvenido.setBounds(398, 222, 97, 41);
+        contentPane.add(lblBienvenido);
+        
+        JButton btnAceptar = new JButton("Aceptar");
+        btnAceptar.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		String usuario = tfUsuario.getText();
+                String contrasena = new String(passwordField.getPassword());
+
+                // Validar que no estén vacíos los campos
+                if (usuario.isEmpty() || contrasena.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Por favor, complete todos los campos", "Advertencia",
+                            JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                // Validar credenciales llamando al método en GestorPersistencia
+                boolean credencialesValidas = GestorPersistencia.validarCredenciales(usuario, contrasena);
+
+                if (credencialesValidas) {
+                    JOptionPane.showMessageDialog(null, "Inicio de sesión exitoso");
+                    
+                    // Abrir la VentanaPrincipal
+                    VentanaPrincipal ventanaPrincipal = new VentanaPrincipal();
+                    ventanaPrincipal.setVisible(true);
+
+                    // Cerrar la VentanaLogin
+                    dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos", "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        btnAceptar.setBorderPainted(false);
+        btnAceptar.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        btnAceptar.setBorder(new LineBorder(new Color(206, 220, 0), 5, true));
+        btnAceptar.setBackground(new Color(206, 220, 0));
+        btnAceptar.setBounds(391, 516, 104, 26);
+        contentPane.add(btnAceptar);
+        
+    }
+}
+
+
+

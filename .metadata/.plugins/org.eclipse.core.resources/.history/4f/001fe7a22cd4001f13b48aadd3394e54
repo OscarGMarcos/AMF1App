@@ -1,0 +1,7 @@
+package Logica;
+
+import Excepciones.ProyectoExcepcion;
+
+public class GestionApp {
+
+}

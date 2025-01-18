@@ -1,0 +1,9 @@
+package Excepciones;
+
+public class PersistenciaExcepcion extends Exception {
+	public PersistenciaExcepcion(String sms) {
+		super(sms);
+		// TODO Auto-generated constructor stub
+	}
+
+}

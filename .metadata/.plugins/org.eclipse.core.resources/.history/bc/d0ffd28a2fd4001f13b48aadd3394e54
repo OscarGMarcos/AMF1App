@@ -1,0 +1,22 @@
+package Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+
+import Logica.GestionApp;
+
+class GestionAppTest {
+
+	@Test
+    public void testSetYGetUsuarioActual() {
+        GestionApp.setUsuarioActual("usuarioTest");
+        assertEquals("usuarioTest", GestionApp.getUsuarioActual());
+    }
+
+	@Test
+	void testCerrarSesion() {
+		fail("Not yet implemented");
+	}
+
+}

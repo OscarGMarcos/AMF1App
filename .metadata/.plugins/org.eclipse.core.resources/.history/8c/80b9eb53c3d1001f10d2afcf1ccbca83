@@ -1,0 +1,9 @@
+/**
+ * 
+ */
+/**
+ * 
+ */
+module PROYECTO_AM {
+	requires java.desktop;
+}

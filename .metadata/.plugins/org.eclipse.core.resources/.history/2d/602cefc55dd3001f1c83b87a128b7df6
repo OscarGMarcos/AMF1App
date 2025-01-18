@@ -1,0 +1,277 @@
+package Interfaz;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.*;
+import javax.swing.*;
+
+public class VentanaPrincipal extends JFrame {
+
+    private static final long serialVersionUID = 1L;
+    private JPanel contentPane;
+    private JPanel panelCentral; // Panel con CardLayout para cambiar subpaneles
+    private Connection connection;
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                VentanaPrincipal frame = new VentanaPrincipal();
+                frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public VentanaPrincipal() {
+        try {
+            // Configurar conexión a la base de datos
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/tu_base_datos", "usuario", "contraseña");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al conectar con la base de datos.");
+            System.exit(1);
+        }
+
+        setTitle("ASTON MARTIN ARAMCO FORMULA ONE TEAM - Inicio");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 1062, 757);
+
+        contentPane = new JPanel();
+        contentPane.setLayout(new BorderLayout());
+        setContentPane(contentPane);
+
+        // Panel Lateral
+        JPanel menuLateral = new JPanel();
+        menuLateral.setPreferredSize(new Dimension(200, 0));
+        contentPane.add(menuLateral, BorderLayout.WEST);
+        menuLateral.setLayout(new BoxLayout(menuLateral, BoxLayout.Y_AXIS));
+
+        JButton btnTemporadas = new JButton("Temporadas");
+        menuLateral.add(btnTemporadas);
+        btnTemporadas.addActionListener(e -> mostrarTemporada());
+
+        JButton btnPilotos = new JButton("Pilotos");
+        menuLateral.add(btnPilotos);
+        btnPilotos.addActionListener(e -> mostrarPilotos());
+
+        // Panel Central
+        panelCentral = new JPanel(new CardLayout());
+        contentPane.add(panelCentral, BorderLayout.CENTER);
+
+        JPanel panelInicio = new JPanel();
+        panelInicio.add(new JLabel("Bienvenido al Sistema de Gestión"));
+        panelCentral.add(panelInicio, "Inicio");
+    }
+
+    private void mostrarTemporada() {
+        JPanel panelTemporada = new JPanel(new GridLayout(5, 1));
+
+        for (int i = 1; i <= 5; i++) { // Asume 5 rondas para simplificar
+            JButton btnRonda = new JButton("Ronda " + i);
+            int rondaId = i;
+            btnRonda.addActionListener(e -> mostrarDetalleRonda(rondaId));
+            panelTemporada.add(btnRonda);
+        }
+
+        panelCentral.add(panelTemporada, "Temporada");
+        ((CardLayout) panelCentral.getLayout()).show(panelCentral, "Temporada");
+    }
+
+    private void mostrarDetalleRonda(int rondaId) {
+        JPanel panelRonda = new JPanel(new GridLayout(6, 2));
+        JTextField nombreGP = new JTextField();
+        JTextField fecha = new JTextField();
+        JTextField posicionFernando = new JTextField();
+        JTextField posicionLance = new JTextField();
+
+        panelRonda.add(new JLabel("Nombre GP:"));
+        panelRonda.add(nombreGP);
+        panelRonda.add(new JLabel("Fecha:"));
+        panelRonda.add(fecha);
+        panelRonda.add(new JLabel("Posición Fernando:"));
+        panelRonda.add(posicionFernando);
+        panelRonda.add(new JLabel("Posición Lance:"));
+        panelRonda.add(posicionLance);
+
+        // Cargar datos de la base de datos
+        try (PreparedStatement stmt = connection.prepareStatement("SELECT nombreGP, fecha FROM carreras WHERE idRonda = ?")) {
+            stmt.setInt(1, rondaId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                nombreGP.setText(rs.getString("nombreGP"));
+                fecha.setText(rs.getString("fecha"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        try (PreparedStatement stmt = connection.prepareStatement("SELECT posicion FROM posiciones WHERE idPiloto = ? AND idRonda = ?")) {
+            stmt.setInt(1, 14); // ID de Fernando
+            stmt.setInt(2, rondaId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                posicionFernando.setText(rs.getString("posicion"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        try (PreparedStatement stmt = connection.prepareStatement("SELECT posicion FROM posiciones WHERE idPiloto = ? AND idRonda = ?")) {
+            stmt.setInt(1, 18); // ID de Lance
+            stmt.setInt(2, rondaId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                posicionLance.setText(rs.getString("posicion"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        JButton btnModificar = new JButton("Modificar");
+        btnModificar.addActionListener(e -> {
+            try (PreparedStatement stmt = connection.prepareStatement("UPDATE carreras SET nombreGP = ?, fecha = ? WHERE idRonda = ?")) {
+                stmt.setString(1, nombreGP.getText());
+                stmt.setString(2, fecha.getText());
+                stmt.setInt(3, rondaId);
+                stmt.executeUpdate();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+
+            try (PreparedStatement stmt = connection.prepareStatement("UPDATE posiciones SET posicion = ? WHERE idPiloto = ? AND idRonda = ?")) {
+                stmt.setString(1, posicionFernando.getText());
+                stmt.setInt(2, 14);
+                stmt.setInt(3, rondaId);
+                stmt.executeUpdate();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+
+            try (PreparedStatement stmt = connection.prepareStatement("UPDATE posiciones SET posicion = ? WHERE idPiloto = ? AND idRonda = ?")) {
+                stmt.setString(1, posicionLance.getText());
+                stmt.setInt(2, 18);
+                stmt.setInt(3, rondaId);
+                stmt.executeUpdate();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+
+            JOptionPane.showMessageDialog(this, "Datos actualizados.");
+        });
+
+        JButton btnCerrar = new JButton("Cerrar");
+        btnCerrar.addActionListener(e -> ((CardLayout) panelCentral.getLayout()).show(panelCentral, "Inicio"));
+
+        panelRonda.add(btnModificar);
+        panelRonda.add(btnCerrar);
+
+        panelCentral.add(panelRonda, "DetalleRonda");
+        ((CardLayout) panelCentral.getLayout()).show(panelCentral, "DetalleRonda");
+    }
+
+    private void mostrarPilotos() {
+        JPanel panelPilotos = new JPanel(new GridLayout(2, 1));
+
+        JButton btnFernando = new JButton("Fernando Alonso");
+        btnFernando.addActionListener(e -> mostrarDetallePiloto(14)); // ID Fernando Alonso
+        panelPilotos.add(btnFernando);
+
+        JButton btnLance = new JButton("Lance Stroll");
+        btnLance.addActionListener(e -> mostrarDetallePiloto(18)); // ID Lance Stroll
+        panelPilotos.add(btnLance);
+
+        panelCentral.add(panelPilotos, "Pilotos");
+        ((CardLayout) panelCentral.getLayout()).show(panelCentral, "Pilotos");
+    }
+
+    private void mostrarDetallePiloto(int pilotoId) {
+        JPanel panelPiloto = new JPanel(new GridLayout(11, 2));
+
+        JTextField nombre = new JTextField();
+        JTextField edad = new JTextField();
+        JTextField ciudadNacimiento = new JTextField();
+        JTextField paisNacimiento = new JTextField();
+        JTextField peso = new JTextField();
+        JTextField altura = new JTextField();
+        JTextField gpDisputados = new JTextField();
+        JTextField podios = new JTextField();
+        JTextField victorias = new JTextField();
+        JTextField puntosTotales = new JTextField();
+
+        panelPiloto.add(new JLabel("Nombre:"));
+        panelPiloto.add(nombre);
+        panelPiloto.add(new JLabel("Edad:"));
+        panelPiloto.add(edad);
+        panelPiloto.add(new JLabel("Ciudad Nacimiento:"));
+        panelPiloto.add(ciudadNacimiento);
+        panelPiloto.add(new JLabel("País Nacimiento:"));
+        panelPiloto.add(paisNacimiento);
+        panelPiloto.add(new JLabel("Peso:"));
+        panelPiloto.add(peso);
+        panelPiloto.add(new JLabel("Altura:"));
+        panelPiloto.add(altura);
+        panelPiloto.add(new JLabel("GP Disputados:"));
+        panelPiloto.add(gpDisputados);
+        panelPiloto.add(new JLabel("Podios:"));
+        panelPiloto.add(podios);
+        panelPiloto.add(new JLabel("Victorias:"));
+        panelPiloto.add(victorias);
+        panelPiloto.add(new JLabel("Puntos Totales:"));
+        panelPiloto.add(puntosTotales);
+
+        // Cargar datos de la base de datos
+        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM pilotos WHERE idPiloto = ?")) {
+            stmt.setInt(1, pilotoId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                nombre.setText(rs.getString("nombre"));
+                edad.setText(rs.getString("edad"));
+                ciudadNacimiento.setText(rs.getString("ciudadNacimiento"));
+                paisNacimiento.setText(rs.getString("paisNacimiento"));
+                peso.setText(rs.getString("peso"));
+                altura.setText(rs.getString("altura"));
+                gpDisputados.setText(rs.getString("gpDisputados"));
+                podios.setText(rs.getString("podios"));
+                victorias.setText(rs.getString("victorias"));
+                puntosTotales.setText(rs.getString("puntosTotales"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        JButton btnModificar = new JButton("Modificar");
+        btnModificar.addActionListener(e -> {
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "UPDATE pilotos SET nombre = ?, edad = ?, ciudadNacimiento = ?, paisNacimiento = ?, peso = ?, altura = ?, gpDisputados = ?, podios = ?, victorias = ?, puntosTotales = ? WHERE idPiloto = ?")) {
+                stmt.setString(1, nombre.getText());
+                stmt.setInt(2, Integer.parseInt(edad.getText()));
+                stmt.setString(3, ciudadNacimiento.getText());
+                stmt.setString(4, paisNacimiento.getText());
+                stmt.setDouble(5, Double.parseDouble(peso.getText()));
+                stmt.setDouble(6, Double.parseDouble(altura.getText()));
+                stmt.setInt(7, Integer.parseInt(gpDisputados.getText()));
+                stmt.setInt(8, Integer.parseInt(podios.getText()));
+                stmt.setInt(9, Integer.parseInt(victorias.getText()));
+                stmt.setInt(10, Integer.parseInt(puntosTotales.getText()));
+                stmt.setInt(11, pilotoId);
+                stmt.executeUpdate();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+
+            JOptionPane.showMessageDialog(this, "Datos actualizados.");
+        });
+
+        JButton btnCerrar = new JButton("Cerrar");
+        btnCerrar.addActionListener(e -> ((CardLayout) panelCentral.getLayout()).show(panelCentral, "Inicio"));
+
+        panelPiloto.add(btnModificar);
+        panelPiloto.add(btnCerrar);
+
+        panelCentral.add(panelPiloto, "DetallePiloto");
+        ((CardLayout) panelCentral.getLayout()).show(panelCentral, "DetallePiloto");
+    }
+}
+

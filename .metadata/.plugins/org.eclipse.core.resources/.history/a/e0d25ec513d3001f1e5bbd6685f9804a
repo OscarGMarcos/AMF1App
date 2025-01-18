@@ -1,0 +1,126 @@
+package Interfaz;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import javax.swing.*;
+
+public class VentanaPrincipal extends JFrame {
+
+    private static final long serialVersionUID = 1L;
+    private JPanel contentPane;
+    private JPanel panelCentral; // Panel con CardLayout para cambiar subpaneles
+    private CardLayout cardLayout;
+
+    /**
+     * Launch the application.
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                VentanaPrincipal frame = new VentanaPrincipal();
+                frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Constructor de la ventana principal.
+     */
+    public VentanaPrincipal() {
+        setTitle("ASTON MARTIN ARAMCO FORMULA ONE TEAM - Inicio");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 1062, 757);
+
+        // Configurar contentPane
+        contentPane = new JPanel();
+        contentPane.setBackground(new Color(0, 102, 94));
+        contentPane.setLayout(new BorderLayout());
+        setContentPane(contentPane);
+
+        // Crear Panel Central con CardLayout (INICIALIZACIÓN)
+        cardLayout = new CardLayout();
+        panelCentral = new JPanel(cardLayout);
+        contentPane.add(panelCentral, BorderLayout.CENTER);
+
+        // Crear Panel Izquierdo (Menú Lateral)
+        JPanel menuLateral = new JPanel();
+        menuLateral.setBackground(new Color(240, 240, 240));
+        menuLateral.setPreferredSize(new Dimension(200, 0));
+        contentPane.add(menuLateral, BorderLayout.WEST);
+        menuLateral.setLayout(null);
+
+        // Crear botón para mostrar menú
+        JButton btnTemporadas = new JButton("Temporadas");
+        btnTemporadas.setBounds(42, 194, 103, 25);
+        btnTemporadas.setFont(new Font("SansSerif", Font.BOLD, 12));
+        menuLateral.add(btnTemporadas);
+
+        // Crear el menú emergente
+        JPopupMenu menuTemporadas = new JPopupMenu();
+
+        JMenu menu2024 = new JMenu("Temporada 2024");
+        JMenu menu2025 = new JMenu("Temporada 2025");
+
+        menuTemporadas.add(menu2024);
+        menuTemporadas.add(menu2025);
+
+        // Agregar rondas al menú 2024
+        for (int i = 1; i <= 24; i++) {
+            JMenuItem rondaItem = new JMenuItem("Ronda " + i);
+            menu2024.add(rondaItem);
+
+            // Crear un panel para cada ronda y añadirlo al CardLayout
+            JPanel panelRonda = new JPanel();
+            panelRonda.setBackground(new Color(0, 102, 94));
+            panelRonda.setLayout(new BorderLayout());
+            JLabel labelRonda = new JLabel("Temporada 2024 - Ronda " + i, SwingConstants.CENTER);
+            labelRonda.setFont(new Font("SansSerif", Font.BOLD, 16));
+            labelRonda.setForeground(Color.WHITE);
+            panelRonda.add(labelRonda, BorderLayout.CENTER);
+
+            String cardName = "2024_Ronda" + i;
+            panelCentral.add(panelRonda, cardName);
+
+            // Asociar ActionListener para cambiar el panel
+            rondaItem.addActionListener(e -> cardLayout.show(panelCentral, cardName));
+        }
+
+        // Agregar rondas al menú 2025
+        for (int i = 1; i <= 24; i++) {
+            JMenuItem rondaItem = new JMenuItem("Ronda " + i);
+            menu2025.add(rondaItem);
+
+            // Crear un panel para cada ronda y añadirlo al CardLayout
+            JPanel panelRonda = new JPanel();
+            panelRonda.setBackground(new Color(0, 102, 94));
+            panelRonda.setLayout(new BorderLayout());
+            JLabel labelRonda = new JLabel("Temporada 2025 - Ronda " + i, SwingConstants.CENTER);
+            labelRonda.setFont(new Font("SansSerif", Font.BOLD, 16));
+            labelRonda.setForeground(Color.WHITE);
+            panelRonda.add(labelRonda, BorderLayout.CENTER);
+
+            String cardName = "2025_Ronda" + i;
+            panelCentral.add(panelRonda, cardName);
+
+            // Asociar ActionListener para cambiar el panel
+            rondaItem.addActionListener(e -> cardLayout.show(panelCentral, cardName));
+        }
+
+        // Mostrar el menú emergente al hacer clic en el botón
+        btnTemporadas.addActionListener(e -> menuTemporadas.show(btnTemporadas, 0, btnTemporadas.getHeight()));
+
+        // Subpanel inicial
+        JPanel panelInicio = new JPanel();
+        panelInicio.setBackground(new Color(0, 102, 94));
+        panelInicio.setLayout(new BorderLayout());
+        JLabel labelInicio = new JLabel("Bienvenido al Sistema de Gestión", SwingConstants.CENTER);
+        labelInicio.setFont(new Font("SansSerif", Font.BOLD, 18));
+        labelInicio.setForeground(Color.WHITE);
+        panelInicio.add(labelInicio, BorderLayout.CENTER);
+
+        panelCentral.add(panelInicio, "Inicio");
+        cardLayout.show(panelCentral, "Inicio");
+    }
+}
